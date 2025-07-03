@@ -12,24 +12,24 @@ import torch
 
 app = Flask(__name__)
 
-# ====== CONFIGURATION ======
+
 UPLOAD_FOLDER = 'static/uploads'
 RESULT_FOLDER = 'static/results'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
-# Create folders if they don't exist
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 cnn_model = load_model('gtsrb_cnn_model.h5')
 print("CNN model loaded successfully")
 
 
-# ====== LOAD MODELS ======
+
 cnn_model = load_model('gtsrb_cnn_model.h5')
 yolo_model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', source='local')
 
-# ====== ROUTES ======
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -51,13 +51,13 @@ def predict():
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(image_path)
 
-    # ----- CNN Prediction -----
+    
     cnn_input = preprocess_for_cnn(image_path)
     cnn_pred = cnn_model.predict(cnn_input)
     class_id = np.argmax(cnn_pred)
     confidence = np.max(cnn_pred)
 
-    # ----- YOLO Detection -----
+    
     results = yolo_model(image_path)
     results.render()
     result_image = results.ims[0]
@@ -74,7 +74,7 @@ def predict():
     """
 
 
-# ====== RUN APP ======
+
 if __name__ == '__main__':
     app.run(debug=True)
 
